@@ -35,21 +35,29 @@ public class Diccionario {
 		}
 	}
 	/**QUEUE**/
-	public Diccionario(String fil,int a) {
-
-		String word = "", traduction ="", description = "";
-		try {
-			Scanner sc = new Scanner(new File(fil));
-			while(sc.hasNext()) {
-				insert(word, traduction, description);
-				System.out.println(word+ "+"+traduction);
-				
-				//String[] a = description.split("[\\p{Space}\\p{Punct}\\p{Digit}¿¡]+");
-			}
-		}catch(IOException o){
-			System.err.println("No existe el archivo");
-		}
-	}
+	public Diccionario(File f){
+        String word = "";
+         try {
+            Scanner sc = new Scanner(f);
+            
+            int numLinea = 1;
+            while(sc.hasNext()) {
+                
+                String line = sc.nextLine();
+                String [] a = line.split("[\\p{Space}\\p{Punct}\\p{Digit}¡¿]");
+                for(int i = 0; i < a.length; i++){
+                    String w = a[i];
+                    insertEst(w, numLinea);
+                }
+                
+                numLinea++; 
+            }
+        }catch(IOException o){
+            System.err.println("No existe el archivo");
+        }
+        
+    
+    }
 	
 	/**
 	 * Insert new word

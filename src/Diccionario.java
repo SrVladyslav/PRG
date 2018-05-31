@@ -35,21 +35,29 @@ public class Diccionario {
 		}
 	}
 	/**QUEUE**/
-	public Diccionario(String fil,int a) {
-
-		String word = "", traduction ="", description = "";
-		try {
-			Scanner sc = new Scanner(new File(fil));
-			while(sc.hasNext()) {
-				insert(word, traduction, description);
-				System.out.println(word+ "+"+traduction);
-				
-				//String[] a = description.split("[\\p{Space}\\p{Punct}\\p{Digit}¿¡]+");
-			}
-		}catch(IOException o){
-			System.err.println("No existe el archivo");
-		}
-	}
+	public Diccionario(File f){
+        String word = "";
+         try {
+            Scanner sc = new Scanner(f);
+            
+            int numLinea = 1;
+            while(sc.hasNext()) {
+                
+                String line = sc.nextLine();
+                String [] a = line.split("[\\p{Space}\\p{Punct}\\p{Digit}Â¡Â¿]");
+                for(int i = 0; i < a.length; i++){
+                    String w = a[i];
+                    insertEst(w, numLinea);
+                }
+                
+                numLinea++; 
+            }
+        }catch(IOException o){
+            System.err.println("No existe el archivo");
+        }
+        
+    
+    }
 	
 	/**
 	 * Insert new word
@@ -77,12 +85,66 @@ public class Diccionario {
             size++;
         }
         else{
-            if(ant.word.equals(p)){}
+            if(ant.word.equalsIgnoreCase(p)){}
             else{
                 ant.next = new NodeString(p,s,desc,aux);
                 size++;
             }
         }
+    }
+	
+	 public void insertEst(String p, int n){
+        NodeString aux = first;
+        NodeString ant = null;
+        
+        while(aux != null && aux.word.compareToIgnoreCase(p)<=0){
+            ant = aux;
+            aux = aux.next;
+        }
+        
+        if(aux == first){
+            p = p.substring(0,1).toUpperCase() + p.substring(1);
+            
+            first = new NodeString(p,first);
+            first.line.add(n);
+            size++;
+        }
+        else if(!ant.word.equalsIgnoreCase(p)){
+                p = p.substring(0,1).toUpperCase() + p.substring(1);
+                
+                ant.next = new NodeString(p,aux);
+                ant.next.line.add(n);
+                size++;
+            }else{
+                ant.line.add(n);
+            }
+    }
+    public String wordLine(String p){
+        NodeString aux = first;
+        
+        while(aux != null && aux.word.compareToIgnoreCase(p)<0){
+            
+            aux = aux.next;
+    
+        }
+        String res = "";
+        if(aux!= null && aux.word.equalsIgnoreCase(p)){
+            res = aux.word + ": " + aux.line.toString();
+        }
+        else{
+            res = "La palabra no se encuentra en el Diccionario";
+        }
+        return res;
+    }
+    public String toStringEst(){
+        String res = "";
+        NodeString aux = first;
+        int cont = 0;
+        while(aux != null){
+            res = res + aux.word + "::" + aux.line.toString() + "\n";
+            aux = aux.next;
+        }
+        return res;
     }
 	/**
 	 * Quit the word
@@ -135,7 +197,7 @@ public class Diccionario {
     	while(aux != null && !aux.word.equalsIgnoreCase(p.trim())){
         	aux = aux.next;
     	}
-    	return aux.word.equalsIgnoreCase(p.trim());
+    	return aux != null;
 		
 		//hecho
 	}
@@ -156,7 +218,7 @@ public class Diccionario {
         Diccionario result = new Diccionario();
         NodeString aux1 = this.first; // nodo a revisar del conjunto this
         NodeString aux2 = other.first; // nodo a revisar de otro
-        NodeString lastResult = null; // último nodo de result, inicialmente null
+        NodeString lastResult = null; // Ãºltimo nodo de result, inicialmente null
         while (aux1 != null && aux2 != null) {
             
             if(aux1.word.equalsIgnoreCase(aux2.word)){
@@ -246,7 +308,7 @@ public class Diccionario {
 	public String toString(){
     	NodeString aux = first;
         int i = 1;
-        String res= "Palabra--------Traducción" + "\n";
+        String res= "Palabra--------TraducciÃ³n" + "\n";
         while(i <= size){
             res += i + "." + aux.word + "   " + aux.traduction;
             res += "\n";
